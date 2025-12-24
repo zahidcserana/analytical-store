@@ -212,6 +212,7 @@ Route::group(['middleware' => ['auth', 'active']], static function () {
     Route::resource('customer', 'CustomerController');
 
     // TODO: remove after lots are no longer a pain
+    Route::post('product/reseller', 'ProductController@reseller')->name('product.reseller');
     Route::get('product/missing-lots', 'ProductController@missingLots')->name('product.missing_lots');
     Route::get('product/data-table', 'ProductController@dataTable')->name('product.dataTable');
     Route::get('product/filterCustomers', 'ProductController@filterCustomers')->name('product.filterCustomers');

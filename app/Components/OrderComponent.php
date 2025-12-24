@@ -977,40 +977,48 @@ class OrderComponent extends BaseComponent
         $query->eachById(static function (Order $order) {
             $readyToShip = 1;
 
-            // TODO check this, I think we should be taking the user/warehouse timezone into account
-            if ($order->hold_until != null && $order->hold_until->greaterThan(now())) {
-                $readyToShip = 0;
-            } else if ($order->has_holds) {
-                $readyToShip = 0;
-            } else if ($order->fulfilled_at != null) {
-                $readyToShip = 0;
-            } else if ($order->cancelled_at != null) {
-                $readyToShip = 0;
-            } else if ($order->archived_at != null) {
-                $readyToShip = 0;
-            } else if ($order->quantity_allocated_sum <= 0) {
-                $readyToShip = 0;
-            } else if ($order->quantity_pending_sum > $order->quantity_allocated_sum + $order->quantity_backordered_sum) {
-                // not all lines went through allocation
-                $readyToShip = 0;
-            } else if ($order->quantity_allocated_sum < $order->quantity_pending_sum && $order->allow_partial == 0) {
-                $readyToShip = 0;
+            if ($order->customer->parent) {
+                $readyToPick = $readyToShip;
+                
+                $order->ready_to_ship = $readyToShip;
+                $order->ready_to_pick = $readyToPick;
+                $order->saveQuietly();
+            } else {
+                // TODO check this, I think we should be taking the user/warehouse timezone into account
+                if ($order->hold_until != null && $order->hold_until->greaterThan(now())) {
+                    $readyToShip = 0;
+                } else if ($order->has_holds) {
+                    $readyToShip = 0;
+                } else if ($order->fulfilled_at != null) {
+                    $readyToShip = 0;
+                } else if ($order->cancelled_at != null) {
+                    $readyToShip = 0;
+                } else if ($order->archived_at != null) {
+                    $readyToShip = 0;
+                } else if ($order->quantity_allocated_sum <= 0) {
+                    $readyToShip = 0;
+                } else if ($order->quantity_pending_sum > $order->quantity_allocated_sum + $order->quantity_backordered_sum) {
+                    // not all lines went through allocation
+                    $readyToShip = 0;
+                } else if ($order->quantity_allocated_sum < $order->quantity_pending_sum && $order->allow_partial == 0) {
+                    $readyToShip = 0;
+                }
+
+                $readyToPick = $readyToShip;
+
+                if ($order->quantity_allocated_pickable_sum <= 0) {
+                    $readyToPick = 0;
+                } else if ($order->quantity_allocated_pickable_sum < $order->quantity_pending_sum && $order->allow_partial == 0) {
+                    $readyToPick = 0;
+                }
+
+                $order->ready_to_ship = $readyToShip;
+                $order->ready_to_pick = $readyToPick;
+
+                $order->regenerateBatchKey();
+
+                $order->saveQuietly();
             }
-
-            $readyToPick = $readyToShip;
-
-            if ($order->quantity_allocated_pickable_sum <= 0) {
-                $readyToPick = 0;
-            } else if ($order->quantity_allocated_pickable_sum < $order->quantity_pending_sum && $order->allow_partial == 0) {
-                $readyToPick = 0;
-            }
-
-            $order->ready_to_ship = $readyToShip;
-            $order->ready_to_pick = $readyToPick;
-
-            $order->regenerateBatchKey();
-
-            $order->saveQuietly();
         });
     }
 

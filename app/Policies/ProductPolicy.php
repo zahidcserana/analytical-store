@@ -60,6 +60,34 @@ class ProductPolicy
         return $user->canAccessCustomer($customerId);
     }
 
+     /**
+     * Determine whether the user can create products.
+     *
+     * @param User $user
+     * @param null $data
+     * @return mixed
+     */
+    public function reseller(User $user, $data = null)
+    {
+        return true;
+
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        $customerId = Arr::get($data, 'customer_id');
+
+        if (!$customerId) {
+            $customerId = request()->input('customer_id');
+        }
+
+        if (!$customerId) {
+            $customerId = request()->input('data.relationships.customer.data.id');
+        }
+
+        return $user->canAccessCustomer($customerId);
+    }
+
     public function batchStore(User $user)
     {
         $dataArr = app('request')->input();

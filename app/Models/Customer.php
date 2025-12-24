@@ -244,7 +244,7 @@ class Customer extends Model
 
     public function shippingMethods()
     {
-        return $this->hasManyThrough(ShippingMethod::class, ShippingCarrier::class)->where('active', true);
+        return $this->hasManyThrough(ShippingMethod::class, ShippingCarrier::class)->where('shipping_methods.active', true);
     }
 
     public function shippingMethodsWithCarrier()

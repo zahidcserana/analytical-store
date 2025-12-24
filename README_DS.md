@@ -11,7 +11,9 @@ Source code for project DropShipping
 
 
 ## Todo
-- Create a Git repo named dropshipping 
-- Seller may add product from Supplier by SKU
+-D: Create a Git repo named dropshipping 
+
+-W: Seller may add product from Supplier by SKU
+
 - There should be a search box to import products
 - 

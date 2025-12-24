@@ -200,6 +200,45 @@ class ProductController extends Controller
         ]);
     }
 
+    public function reseller(Request $request)
+    {
+        $product = Product::find($request->product_id);
+
+        $data = [
+            'sku' => $product->sku,
+            'name' => $product->name,
+            'barcode' => $product->barcode,
+            'price' => $product->price,
+            'cost' => $product->cost,
+            'value' => $product->value,
+            'hs_code' => $product->hs_code,
+            'weight' => $product->weight,
+            'height' => $product->height,
+            'length' => $product->length,
+            'width' => $product->width,
+            'customs_price' => $product->customs_price,
+            'customs_description' => $product->customs_description,
+            'quantity_on_hand' => $product->quantity_on_hand,
+            'quantity_available' => $product->quantity_available,
+            'quantity_allocated' => $product->quantity_allocated,
+            'quantity_backordered' => $product->quantity_backordered,
+            'quantity_reserved' => $product->quantity_reserved,
+            'quantity_inbound' => max(0, $product->quantity_inbound),
+            'quantity_sell_ahead' => $product->quantity_sell_ahead,
+            'country_of_origin' => $product->country->id ?? '',
+            'notes' => $product->notes,
+            'product_images' => [
+                'source' => $product->productImages->first()->source ?? ''
+            ],
+            'vendor' => $product->suppliers->pluck('id'),
+            'customer_id' => $request->customer_id
+        ];
+
+        $createdProduct = app('product')->store(StoreRequest::make($data));
+
+        return redirect()->back()->withStatus(__('Product added successfully.'));
+    }
+
     /**
      * @param Product $product
      * @return Application|Factory|\Illuminate\Contracts\View\View

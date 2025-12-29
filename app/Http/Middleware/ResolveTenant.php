@@ -16,20 +16,22 @@ class ResolveTenant
         $host = parse_url($origin, PHP_URL_HOST);
         $mainDomain = config('app.main_domain');
 
-        // Resolve subdomain (e.g. ahlansahlan)
         $subdomain = null;
         if ($host && preg_match("/^(.*?)\.{$mainDomain}$/", $host, $matches)) {
             $subdomain = $matches[1];
         }
 
-        // Try resolving tenant
         $tenant = Customer::query()
             ->where('store_domain', $host)
-            ->orWhere('slug', $subdomain)
-            ->orWhere('slug', $request->route('tenantSlug'))
+            ->when($subdomain, function ($query) use ($subdomain) {
+                $query->orWhere('slug', $subdomain);
+            })
             ->first();
 
-        // Local environment fallback
+        if (!$tenant && $request->route('tenantSlug')) {
+            $tenant = Customer::where('slug', $request->route('tenantSlug'))->first();
+        }
+
         if (!$tenant && app()->environment('local')) {
             $tenant = Customer::first();
         }

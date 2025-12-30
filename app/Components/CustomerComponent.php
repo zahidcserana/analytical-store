@@ -2,6 +2,7 @@
 
 namespace App\Components;
 
+use App\Enums\Source;
 use App\Http\Requests\Customer\DestroyBatchRequest;
 use App\Http\Requests\Customer\DestroyRequest;
 use App\Http\Requests\Customer\StoreBatchRequest;
@@ -31,7 +32,7 @@ use Illuminate\Support\Facades\Storage;
 
 class CustomerComponent extends BaseComponent
 {
-    public function store(FormRequest $request)
+    public function store(FormRequest $request, ?Source $source = null)
     {
         $user = auth()->user();
         $input = $request->validated();
@@ -54,11 +55,11 @@ class CustomerComponent extends BaseComponent
 
         $customer = Customer::create($input);
 
-        if ($user && !$user->isAdmin()) {
+        if ($source != Source::PUBLIC_API && ($user && !$user->isAdmin())) {
             $user->customers()->attach($customer, ['role_id' => UserRole::ROLE_DEFAULT]);
         }
 
-        if (Arr::exists($input, 'parent_customer_id') && auth()->user()->isAdmin()) {
+        if (Arr::exists($input, 'parent_customer_id') && ($source == Source::PUBLIC_API || auth()->user()->isAdmin())) {
             $customer->parent_id = Arr::get($input, 'parent_customer_id');
             Arr::forget($input, 'parent_customer_id');
         } elseif (!is_null(app()->user->getSessionCustomer())) {
@@ -353,5 +354,14 @@ class CustomerComponent extends BaseComponent
         }
 
         return $input;
+    }
+    
+    public function toggleHold(Customer $customer)
+    {
+        $customer->update([
+            'is_hold' => ! $customer->is_hold,
+        ]);
+
+        return $customer;
     }
 }

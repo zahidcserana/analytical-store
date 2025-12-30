@@ -157,6 +157,7 @@ class Customer extends Model
         'store_domain',
         'ship_from_contact_information_id',
         'return_to_contact_information_id',
+        'is_hold'
     ];
 
     protected $casts = [

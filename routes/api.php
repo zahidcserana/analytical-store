@@ -488,4 +488,5 @@ Route::prefix('storefront/{tenantSlug}')
         Route::get('/tag_products/{tagSlug}', [ProductController::class, 'getProductsByTag']);
 
         Route::post('/orders', [OrderController::class, 'store']);
+        Route::post('/customer-create', [HomeController::class, 'storeCustomer']);
     });

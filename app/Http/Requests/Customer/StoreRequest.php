@@ -33,6 +33,9 @@ class StoreRequest extends FormRequest
             'slug' => [
                 'nullable'
             ],
+            'is_hold' => [
+                'nullable'
+            ],
             'store_domain' => [
                 'nullable'
             ],

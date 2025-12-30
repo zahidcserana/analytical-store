@@ -10,6 +10,10 @@ use App\Models\CustomerSetting;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Http\Requests\Customer\StoreRequest;
+use Illuminate\Support\Facades\DB;
+use App\Enums\Source;
+
 
 class HomeController extends ApiController
 {
@@ -77,5 +81,32 @@ class HomeController extends ApiController
         ];
 
         return response()->json($response);
+    }
+
+    public function storeCustomer(Request $request)
+    {
+        try {
+            
+            return DB::transaction(function () use ($request) {
+                $tenant = app('tenant');
+                $input = $request->all();
+                $input['parent_customer_id'] = $tenant->id;
+                $input['is_hold'] = true;
+    
+                $storeRequest = StoreRequest::make($input);
+                $customer = app('customer')->store($storeRequest, source: Source::PUBLIC_API);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => __('Customer successfully created.')
+                ]);
+            });
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+            ], 500);
+        }
     }
 }

@@ -117,6 +117,17 @@ class CustomerController extends Controller
         ]);
     }
 
+    public function toggleHold(Customer $customer)
+    {
+        $customer = app('customer')->toggleHold($customer);
+        $customer->refresh();
+
+        return response()->json([
+            'message' => 'Customer hold status updated',
+            'is_hold' => $customer->is_hold,
+        ]);
+    }
+
     /**
      * @param Request $request
      * @param Customer $customer

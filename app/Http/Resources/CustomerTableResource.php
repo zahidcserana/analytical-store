@@ -18,6 +18,8 @@ class CustomerTableResource extends JsonResource
     {
         unset($resource);
 
+        $resource['id'] = $this->id;
+        $resource['is_hold'] = $this->is_hold;
         $resource['name'] = $this->contactInformation->name;
         $resource['company_name'] = $this->contactInformation->company_name;
         $resource['store_name'] = $this->slug;
@@ -28,6 +30,7 @@ class CustomerTableResource extends JsonResource
         $resource['email'] = $this->contactInformation->email;
         $resource['phone'] = $this->contactInformation->phone;
         $resource['link_edit'] =  route('customer.edit', ['customer' => $this]);
+        $resource['toggle_hold_url'] = route('customer.toggleHold', $this);
         $resource['link_store'] =  get_app_link($this);
         $resource['link_delete'] = [
             'token' => csrf_token(),

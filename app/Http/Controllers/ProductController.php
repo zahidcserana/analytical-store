@@ -227,10 +227,11 @@ class ProductController extends Controller
             'quantity_sell_ahead' => $product->quantity_sell_ahead,
             'country_of_origin' => $product->country->id ?? '',
             'notes' => $product->notes,
-            'product_images' => [
-                'source' => $product->productImages->first()->source ?? ''
-            ],
-            'vendor' => $product->suppliers->pluck('id'),
+            'product_images' => $product->productImages->map(function ($img) {
+                return [
+                    'source' => $img->source ?? '',
+                ];
+            })->toArray(),
             'customer_id' => $request->customer_id
         ];
 

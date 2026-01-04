@@ -157,6 +157,7 @@ class Customer extends Model
         'store_domain',
         'ship_from_contact_information_id',
         'return_to_contact_information_id',
+        'is_hold'
     ];
 
     protected $casts = [
@@ -244,7 +245,7 @@ class Customer extends Model
 
     public function shippingMethods()
     {
-        return $this->hasManyThrough(ShippingMethod::class, ShippingCarrier::class)->where('active', true);
+        return $this->hasManyThrough(ShippingMethod::class, ShippingCarrier::class)->where('shipping_methods.active', true);
     }
 
     public function shippingMethodsWithCarrier()

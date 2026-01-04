@@ -8,7 +8,11 @@
                 <a class="dropdown-item parent-customer-dropdown-item" href="{{ route('user.removeSessionCustomer') }}">{{ __('All') }}</a>
             @endif
             @foreach (app()->user->getSortedCustomers() as $customer)
-                <a class="dropdown-item {{$customer->parent_id ? 'customer-dropdown-item' : 'parent-customer-dropdown-item'}}" href="{{ route('user.setSessionCustomer', ['customer' => $customer->id])}}">{{$customer->parent_id ? '-' : ''}} {{ $customer->contactInformation->name ?? '' }}</a>
+                @if ($customer->is_hold)
+                    <a class="dropdown-item {{$customer->parent_id ? 'customer-dropdown-item' : 'parent-customer-dropdown-item'}}" href="{{ route('customer.edit', ['customer' => $customer->id])}}">{{$customer->parent_id ? '<-' : ''}} {{ $customer->contactInformation->name ?? '' }}</a>
+                @else
+                    <a class="dropdown-item {{$customer->parent_id ? 'customer-dropdown-item' : 'parent-customer-dropdown-item'}}" href="{{ route('user.setSessionCustomer', ['customer' => $customer->id])}}">{{$customer->parent_id ? '-' : ''}} {{ $customer->contactInformation->name ?? '' }}</a>
+                @endif
             @endforeach
         </div>
     @endif

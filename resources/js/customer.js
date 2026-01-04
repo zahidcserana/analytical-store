@@ -14,6 +14,26 @@ window.Customer = function () {
                             </a>`;
                 },
             },
+            {
+                "orderable": false,
+                "class":"text-left",
+                "title": "Hold",
+                "data": function (data) {
+                    const checked = data.is_hold ? 'checked' : '';
+            
+                    return `
+                        <label class="toggle float-left">
+                            <input type="checkbox"
+                                   class="toggle-hold"
+                                   data-action="${ data.toggle_hold_url }"
+                                   data-id="${data.id}"
+                                   ${checked}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    `;
+                }
+            },
+            
             {"title": "Name", "data": "name", "name": "contact_informations.name"},
             {"title": "Company Name", "data": "company_name", "name": "contact_informations.company_name"},
 
@@ -22,7 +42,7 @@ window.Customer = function () {
                 "class":"text-left",
                 "title": "Store",
                 "data": function (data) {
-                    if (data['link_store'])
+                    if (data['store_name'])
                         return `<a type="button" class="table-icon-button" href="${data['link_store']}" target="_blank">
                                     ${data['store_name']}
                                 </a>`;
@@ -50,4 +70,34 @@ window.Customer = function () {
             }
         ],
     })
+    
+    $(document).on('click', '.toggle-hold', function (e) {
+        e.preventDefault();            // stop label toggle
+        e.stopImmediatePropagation();  // stop browser default
+    
+        const checkbox = this; // raw DOM element
+        const $checkbox = $(this);
+        const action = $checkbox.data('action');
+    
+        const willHold = !checkbox.checked;
+    
+        const title = willHold ? 'Hold Customer' : 'Unhold Customer';
+        const message = willHold
+            ? 'This customer will be put on hold.'
+            : 'This customer will be removed from hold.';
+    
+        app.confirm(title, message, function () {
+            $.ajax({
+                method: 'PATCH',
+                url: action,
+                success: function (response) {
+                    window.dtInstances['#customers-table'].ajax.reload()
+                    toastr.success(response.message);
+                },
+                error: function () {
+                    toastr.error('Failed to update hold status');
+                }
+            });
+        });    
+    });    
 }

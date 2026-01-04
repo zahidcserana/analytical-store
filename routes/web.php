@@ -206,12 +206,14 @@ Route::group(['middleware' => ['auth', 'active']], static function () {
     Route::resource('customers.pathao_credentials', 'PathaoCredentialController');
 
     Route::get('customer/{customer}/cssOverrides', 'CustomerController@edit')->name('customer.cssOverrides');
+    Route::patch('customer/{customer}/toggle-hold', 'CustomerController@toggleHold')->name('customer.toggleHold');
 
     Route::get('customer/{customer}/filterUsers', 'CustomerController@filterusers')->name('customer.filterUsers');
     Route::get('customer/{customer}/dimension_units', 'CustomerController@getDimensionUnits')->name('customer.dimensionUnits');
     Route::resource('customer', 'CustomerController');
 
     // TODO: remove after lots are no longer a pain
+    Route::post('product/reseller', 'ProductController@reseller')->name('product.reseller');
     Route::get('product/missing-lots', 'ProductController@missingLots')->name('product.missing_lots');
     Route::get('product/data-table', 'ProductController@dataTable')->name('product.dataTable');
     Route::get('product/filterCustomers', 'ProductController@filterCustomers')->name('product.filterCustomers');

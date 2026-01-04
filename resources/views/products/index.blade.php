@@ -14,6 +14,33 @@
         ]
     ])
 
+    @if (app('user')->getSessionCustomer()->parent->id ?? null)
+    <div class="container-fluid  select2Container">
+        <form action="{{ route('product.reseller') }}" method="post">
+            @csrf
+            <input type="hidden" id="customer_id" name="customer_id" value="{{ app('user')->getSessionCustomer()->id }}" class="customer_id" />
+
+            <div class="row">
+                <div class="col-6">
+                    @include('shared.forms.ajaxSelect', [
+                        'url' => route('supplier.filterProducts', ['customer' => app('user')->getSessionCustomer()->parent->id]),
+                        'name' => 'product_id',
+                        'className' => 'ajax-user-input product_id',
+                        'placeholder' => __('Search products'),
+                        'label' => '',
+                        'fixRouteAfter' => '.ajax-user-input.customer_id'
+                    ])
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn bg-logoOrange text-white font-weight-700 mt-4" id="submit-reseller-product">
+                        {{ __('Add Product') }}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    @endif
+
     <x-datatable
             search-placeholder="{{ __('Search product') }}"
             table-id="products-table"
